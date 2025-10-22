@@ -12,6 +12,7 @@ import AdminDoctors from './pages/AdminDoctors';
 import AdminAppointments from './pages/AdminAppointments';
 import AdminLayout from './pages/AdminLayout';
 import AdminReports from './pages/AdminReports';
+import AdminLogin from './pages/AdminLogin';
 import DoctorLogin from './pages/DoctorLogin';
 import DoctorSignup from './pages/DoctorSignup';
 import DoctorProfile from './pages/DoctorProfile';
@@ -28,6 +29,7 @@ export default function App(){
           <Route path="/doctor/signup" element={<DoctorSignup/>} />
           <Route path="/doctor/profile" element={<DoctorProfile/>} />
           <Route path="/success" element={<Success/>} />
+          <Route path="/admin/login" element={<AdminLogin/>} />
           <Route path="/appointments" element={<Appointments/>} />
           <Route path="/profile" element={<Profile/>} />
           <Route path="/admin" element={<AdminLayout/>}>

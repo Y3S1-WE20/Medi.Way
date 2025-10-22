@@ -1,8 +1,17 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { FaClipboardList, FaUserNurse, FaChartPie } from 'react-icons/fa';
 
 export default function AdminLayout(){
+  const navigate = useNavigate();
+
+  React.useEffect(()=>{
+    const isAdmin = localStorage.getItem('isAdmin');
+    if (!isAdmin) {
+      navigate('/admin/login');
+    }
+  }, [navigate]);
+
   return (
     <div style={{display:'grid', gridTemplateColumns:'240px 1fr', gap:16, width:'100%'}}>
       <aside className="card" style={{height:'fit-content', position:'sticky', top:20, alignSelf:'start'}}>
