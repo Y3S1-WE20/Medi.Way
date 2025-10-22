@@ -45,7 +45,7 @@ export default function Layout({ children }) {
           {healthId && (
             <NavLink to="/profile" className={({isActive})=> isActive? 'active' : undefined}><FaUserCircle/> Profile</NavLink>
           )}
-          <NavLink to="/admin/appointments" className={({isActive})=> isActive? 'active' : undefined}><FaClipboardList/> Admin</NavLink>
+          <NavLink to="/admin/login" className={({isActive})=> isActive? 'active' : undefined}><FaClipboardList/> Admin</NavLink>
           {!healthId && !doctorId && (
             <>
               <NavLink to="/register" className={({isActive})=> isActive? 'active' : undefined}><FaUserPlus/> Register</NavLink>
