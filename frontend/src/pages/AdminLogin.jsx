@@ -34,7 +34,7 @@ export default function AdminLogin(){
           <button type="submit" className="btn primary">Login</button>
         </div>
       </form>
-      <div style={{marginTop:12, fontSize:13, color:'#666'}}>Hint: username <strong>admin</strong> password <strong>admin123</strong></div>
+      <div style={{marginTop:12, fontSize:13, color:'#666'}}></div>
     </div>
   );
 }
