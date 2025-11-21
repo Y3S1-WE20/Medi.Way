@@ -40,4 +40,5 @@ jobs:
 
       - name: Deployment info
         if: success()
-        run: echo "Frontend deployed to Vercel (project id: ${{ secrets.VERCEL_PROJECT_ID }})"
+        run: |
+          echo "Frontend deployed to Vercel (project id: ${{ secrets.VERCEL_PROJECT_ID }})"
