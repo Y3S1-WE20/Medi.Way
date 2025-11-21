@@ -1,0 +1,11 @@
+target
+**/target
+.mvn/wrapper/maven-wrapper.jar
+*.log
+*.tmp
+*.swp
+Dockerfile*
+README.md
+node_modules
+.git
+.github
