@@ -131,23 +131,48 @@ graph LR
 ---
 
 ## 🚀 Installation & Setup
-### 1. Clone
+
+### Quick Start (Recommended - Docker)
+
+The fastest way to run the entire application:
+
+```bash
+# Clone the repository
+git clone https://github.com/Y3S1-WE20/Medi.Way.git
+cd Medi.Way
+
+# Start all services with Docker Compose
+docker-compose up --build
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8080
+# MySQL: localhost:3306
+```
+
+### Manual Setup
+
+#### 1. Clone
 ```bash
 git clone https://github.com/Y3S1-WE20/Medi.Way.git
 cd Medi.Way
 ```
-### 2. Frontend
+
+#### 2. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm start   # http://localhost:3000
 ```
-### 3. Backend
+
+#### 3. Backend Setup
 In another terminal:
 ```bash
 cd backend
 ./mvnw spring-boot:run   # http://localhost:8080
 ```
+
+> **Note:** Backend will use H2 in-memory database by default. For MySQL, configure `application.properties` or use Docker setup.
 By default expects MySQL; for tests / light dev switch to H2 by exporting:
 ```bash
 export SPRING_PROFILES_ACTIVE=test
@@ -230,17 +255,6 @@ docker compose down -v
 - 🔒 Password hashing via Spring Security Crypto
 - 🎯 Role-based access control (RBAC)
 - 🚀 Expandable for JWT/session authentication
-
----
-
-## 👥 Contributors
-
-This project is developed and maintained by:
-
-- [@Nipuni002](https://github.com/Nipuni002)
-- [@shiranthadissanayake](https://github.com/shiranthadissanayake)
-
-We welcome contributions! Feel free to open issues or submit pull requests.
 
 ---
 
