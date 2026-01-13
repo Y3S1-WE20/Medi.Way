@@ -233,6 +233,17 @@ docker compose down -v
 
 ---
 
+## 👥 Contributors
+
+This project is developed and maintained by:
+
+- [@Nipuni002](https://github.com/Nipuni002)
+- [@shiranthadissanayake](https://github.com/shiranthadissanayake)
+
+We welcome contributions! Feel free to open issues or submit pull requests.
+
+---
+
 <div align="center">
 
 ### 🌟 Made with ❤️ by the MediWay Team

@@ -1,157 +1,82 @@
-# MediWay Hospital Management System
+# MEDI.WAY Frontend
 
-> Modern full‑stack healthcare management platform providing appointment scheduling, patient records, administrative analytics, and secure role-based access.
+A modern healthcare management system built with React.
 
-## 🎯 Project Overview
-MediWay unifies patient, doctor and admin experiences into a single system:
-- Streamlined appointment booking & availability management
-- Secure medical record storage and retrieval
-- Real-time reporting & operational insights
-- Containerized deployment (Docker / Compose)
-- CI workflow (GitHub Actions) with backend & frontend test automation + coverage
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## 🔑 Key Capabilities
-- **Appointment Management**: Intelligent slot validation prevents double booking (application-level conflict detection, extensible to optimistic locking)
-- **Patient Records**: Complete visit & diagnosis history with controlled access
-- **Administrative Dashboard**: Aggregated KPIs, doctor load, cancellations, specialization stats
-- **Role-Based Security**: Distinct flows for patients, doctors, and admins (separate login paths)
-- **Exportable Reports**: PDF & CSV generation (OpenPDF)
-- **QR Code Integration**: Fast patient identification via ZXing
+## Features
 
-## ✨ Features
-### 🏥 Appointment Scheduling System
-- Doctor Availability & 30‑minute time slots
-- Conflict Prevention: Checks existing appointments before persistence
-- Status Lifecycle: `PENDING → CONFIRMED/REJECTED → CANCELLED`
-- Reschedule & Cancellation endpoints
-- Extensible for future concurrency strategies (optimistic/pessimistic locking)
+- Patient appointment booking and management
+- Doctor profile management
+- Admin dashboard for system oversight
+- Medical records tracking
+- Secure authentication system
 
-### 👥 Patient Management
-- Rich Profile Data: Core identity & emergency contacts
-- Medical Records CRUD: Diagnoses, treatments, notes
-- QR Code Generation for quick retrieval
-- Secure Access Boundaries (service layer separation & profile scoping)
+## Getting Started with Create React App
 
-### 📊 Administrative Dashboard
-- Workload Analytics: Appointments per doctor per day
-- Demographics & Registration Trends
-- Specialization & cancellation summaries
-- Export: One‑click PDF or CSV downloads
+## Available Scripts
 
-## 🧱 Technical Architecture
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 19, React Router, Testing Library |
-| Backend | Spring Boot 3 (Java 17) |
-| Persistence | MySQL (prod) / H2 (test profile) |
-| Build | Maven, JaCoCo coverage |
-| Security | Spring Security Crypto (password hashing) |
-| Reports | OpenPDF (PDF), native CSV assembly |
-| QR Codes | ZXing |
-| Containerization | Docker & Docker Compose |
-| CI/CD | GitHub Actions (frontend & backend jobs) |
+In the project directory, you can run:
 
-### High-Level Flow
-```
-React SPA (nginx) → REST API (Spring Boot) → JPA/Hibernate → MySQL/H2
-					 ↓
-				 Reporting Service (PDF/CSV)
-```
+### `npm start`
 
-## 📦 Prerequisites
-- Node.js ≥ 18.x
-- Java 17 (Temurin recommended)
-- Docker (Desktop) for container-based workflow
-- Maven wrapper included (`./mvnw`)
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## 🚀 Installation & Setup (Local Dev)
-### 1. Clone
-```bash
-git clone https://github.com/Y3S1-WE20/Medi.Way.git
-cd Medi.Way
-```
-### 2. Frontend
-```bash
-cd frontend
-npm install
-npm start   # http://localhost:3000
-```
-### 3. Backend
-In another terminal:
-```bash
-cd backend
-./mvnw spring-boot:run   # http://localhost:8080
-```
-By default expects MySQL; for tests / light dev switch to H2 by exporting:
-```bash
-export SPRING_PROFILES_ACTIVE=test
-```
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-## 🧪 Testing
-### Backend
-```bash
-cd backend
-./mvnw test
-```
-Generates coverage at `backend/target/site/jacoco/index.html`.
+### `npm test`
 
-### Frontend
-```bash
-cd frontend
-npm test -- --watchAll=false
-```
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-## 🐳 Docker / Compose
-Build & run all services (MySQL + backend + frontend):
-```bash
-docker compose up --build
-```
-Access:
-- Frontend: http://localhost:3000
-- Backend:  http://localhost:8080
-- MySQL:    localhost:3306
+### `npm run build`
 
-Tear down:
-```bash
-docker compose down
-```
-Reset database:
-```bash
-docker compose down -v
-```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## ⚙️ Configuration
-| Variable | Purpose | Example |
-|----------|---------|---------|
-| `SPRING_PROFILES_ACTIVE` | Choose profile (`test` uses H2) | `test` |
-| `SPRING_DATASOURCE_URL` | JDBC URL when using MySQL | `jdbc:mysql://db:3306/mediway` |
-| `REACT_APP_API_BASE_URL` | Frontend build-time API base | `http://localhost:8080` |
-| `JAVA_OPTS` | JVM tuning flags | `-Xms256m -Xmx512m` |
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-## 🔄 Continuous Integration
-GitHub Actions workflow runs:
-- Backend: Maven build + tests + JaCoCo artifact
-- Frontend: Install, lint (optional), tests, build artifact
-- Combined summary job for status aggregation
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## 🛡 Security & Access
-- Separate login routes for Admin, Doctor, Patient
-- Password hashing via Spring Security Crypto
-- Expandable for JWT/session authentication & fine-grained RBAC
+### `npm run eject`
 
-## 📈 Future Enhancements
-- Optimistic locking on appointment rows (`@Version` field)
-- Full audit trail for record modifications
-- Role-based API gateway / OAuth2 integration
-- Container healthchecks & observability (Prometheus/Grafana)
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-## 🤝 Contributing
-1. Fork & branch: `feat/<description>`
-2. Run tests & ensure coverage stays ≥ target
-3. Open PR with summary & rationale
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-## 📝 License
-Project license can be added here (e.g. MIT) if required.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
----
-_Generated & maintained with assistance from GitHub Copilot._
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
