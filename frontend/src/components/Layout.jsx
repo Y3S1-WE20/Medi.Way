@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FaUserCircle, FaClipboardList, FaCalendarCheck, FaHome, FaSignInAlt, FaSignOutAlt, FaUserPlus, FaUserMd } from 'react-icons/fa';
+import Chatbot from './Chatbot';
 import '../index.css';
 
 export default function Layout({ children }) {
@@ -66,6 +67,9 @@ export default function Layout({ children }) {
       </header>
   <main className={`main ${(isAdmin || isDoctor) ? 'admin-main' : ''}`}>{children}</main>
       <footer className="footer">© {new Date().getFullYear()} MediWay Smart Healthcare</footer>
+      
+      {/* Chatbot - Hidden on admin pages */}
+      {!isAdmin && <Chatbot />}
     </div>
   );
 }
