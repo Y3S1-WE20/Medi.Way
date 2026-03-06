@@ -1,0 +1,37 @@
+# ============================================================
+# Backend .dockerignore
+# ============================================================
+
+# Git
+.git
+.gitignore
+
+# Maven
+target/
+!target/*.jar
+*.jar
+!target/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Test output
+test-output/
+surefire-reports/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# OS files
+.DS_Store
+Thumbs.db

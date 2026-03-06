@@ -1,0 +1,131 @@
+# ============================================================
+# MEDI.WAY Docker Compose Configuration
+# ============================================================
+#
+# Services:
+# - mysql:    MySQL 8.0 database
+# - backend:  Spring Boot API (port 8080)
+# - frontend: React app with Nginx (port 80)
+#
+# Usage:
+#   Development: docker-compose up -d
+#   Production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   Stop:        docker-compose down
+#   Logs:        docker-compose logs -f
+#
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ──────────────────────────────────────────────────────────
+  # MySQL Database Service
+  # ──────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: mediway-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mediway}
+      MYSQL_USER: ${MYSQL_USER:-mediway}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mediway123}
+    volumes:
+      # Persist database data
+      - mysql_data:/var/lib/mysql
+      # Initialization scripts
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - mediway-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+
+  # ──────────────────────────────────────────────────────────
+  # Backend API Service
+  # ──────────────────────────────────────────────────────────
+  backend:
+    image: ${DOCKER_USERNAME:-mediway}/mediway-backend:${BUILD_NUMBER:-latest}
+    container_name: mediway-backend
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      # Database Configuration
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mediway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-mediway}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-mediway123}
+      
+      # JPA Configuration
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      
+      # Server Configuration
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
+      
+      # JVM Options
+      JAVA_OPTS: "-Xms256m -Xmx512m -XX:+UseG1GC"
+    ports:
+      - "8080:8080"
+    networks:
+      - mediway-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ──────────────────────────────────────────────────────────
+  # Frontend Service
+  # ──────────────────────────────────────────────────────────
+  frontend:
+    image: ${DOCKER_USERNAME:-mediway}/mediway-frontend:${BUILD_NUMBER:-latest}
+    container_name: mediway-frontend
+    restart: unless-stopped
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - mediway-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  mediway-network:
+    driver: bridge
+    name: mediway-network
+
+# ============================================================
+# Volumes
+# ============================================================
+volumes:
+  mysql_data:
+    driver: local
+    name: mediway-mysql-data

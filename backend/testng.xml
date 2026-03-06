@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MEDI.WAY Test Suite" verbose="2" parallel="classes" thread-count="2">
+    
+    <!-- Custom Listeners for Enhanced Reporting -->
+    <listeners>
+        <listener class-name="backend.listeners.MediWayTestListener"/>
+    </listeners>
+    
+    <!-- ============================================ -->
+    <!-- Unit Tests - Member 1 (Assertions Demo)     -->
+    <!-- ============================================ -->
+    <test name="Assertions Demo Tests">
+        <groups>
+            <run>
+                <include name="assertions"/>
+                <include name="unit"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="backend.AssertionsDemoTest"/>
+        </classes>
+    </test>
+    
+    <!-- ============================================ -->
+    <!-- Fixtures Tests - Member 2 (Setup/Teardown)  -->
+    <!-- ============================================ -->
+    <test name="Fixtures Demo Tests">
+        <groups>
+            <run>
+                <include name="fixtures"/>
+                <include name="unit"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="backend.FixturesDemoTest"/>
+        </classes>
+    </test>
+    
+    <!-- ============================================ -->
+    <!-- Service Unit Tests                          -->
+    <!-- ============================================ -->
+    <test name="Service Unit Tests">
+        <groups>
+            <run>
+                <include name="unit"/>
+                <include name="service"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="backend.service.PatientServiceTest"/>
+            <class name="backend.service.DoctorServiceTest"/>
+            <class name="backend.service.AppointmentServiceTest"/>
+        </classes>
+    </test>
+    
+    <!-- ============================================ -->
+    <!-- Model Tests                                 -->
+    <!-- ============================================ -->
+    <test name="Model Tests">
+        <groups>
+            <run>
+                <include name="model"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="backend.model.ModelTest"/>
+        </classes>
+    </test>
+    
+    <!-- ============================================ -->
+    <!-- Integration Tests                           -->
+    <!-- ============================================ -->
+    <test name="Integration Tests">
+        <groups>
+            <run>
+                <include name="integration"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="backend.IntegrationTest"/>
+        </classes>
+    </test>
+    
+</suite>
