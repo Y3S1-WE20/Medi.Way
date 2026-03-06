@@ -7,7 +7,7 @@ import backend.repository.AppointmentRepository;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -31,16 +31,17 @@ public class DoctorServiceTest {
     private AppointmentRepository appointmentRepository;
     
     private DoctorService doctorService;
+    private AutoCloseable closeable;
     
-    @BeforeClass
-    public void setUpClass() {
-        MockitoAnnotations.openMocks(this);
+    @BeforeMethod
+    public void setUp() {
+        closeable = MockitoAnnotations.openMocks(this);
         doctorService = new DoctorService(doctorRepository, appointmentRepository);
     }
     
-    @BeforeMethod
-    public void resetMocks() {
-        reset(doctorRepository, appointmentRepository);
+    @AfterMethod
+    public void tearDown() throws Exception {
+        closeable.close();
     }
     
     @Test(groups = {"unit", "service"})

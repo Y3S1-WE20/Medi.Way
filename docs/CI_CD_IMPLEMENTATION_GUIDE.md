@@ -28,11 +28,12 @@ This guide will help you implement a complete CI/CD pipeline for the Medi.Way ap
 - **Docker** for containerization
 - **DockerHub** for image registry
 - **AWS EC2** for hosting
+- **GitHub Webhooks** for instant build triggers
 
 ### Pipeline Flow
 
 ```
-Code Push → GitHub → Jenkins → Build → TestNG Tests → Docker Build → 
+Code Push → GitHub Webhook → Jenkins → Build → TestNG Tests → Docker Build → 
 DockerHub Push → EC2 Deployment → Health Checks → Success! 🎉
 ```
 
@@ -40,6 +41,7 @@ DockerHub Push → EC2 Deployment → Health Checks → Success! 🎉
 
 - **First-time setup:** 2-3 hours
 - **Subsequent pipeline runs:** 5-10 minutes
+- **Build trigger latency:** <10 seconds with webhooks
 
 ---
 
@@ -531,7 +533,11 @@ git remote add origin https://github.com/YOUR-USERNAME/Medi.Way.git
 git push -u origin main
 ```
 
-### Step 4.2: Add GitHub Credentials to Jenkins (if private repo)
+### Step 4.2: Configure GitHub Webhook
+
+**Set up automatic build triggers using GitHub webhooks for instant builds on code push.**
+
+#### 4.2.1: Add GitHub Credentials to Jenkins (if private repo)
 
 1. **Manage Jenkins** → **Credentials** → **(global)** → **Add Credentials**
 2. Configure:
@@ -544,9 +550,59 @@ git push -u origin main
    ```
 
 **To create GitHub PAT:**
-- GitHub → Settings → Developer settings → Personal access tokens → Generate new token
-- Select scopes: `repo` (all)
-- Copy the token
+- GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token
+- Token name: `Jenkins CI/CD`
+- Expiration: `90 days` (or custom)
+- Select scopes: 
+  - `repo` (all) - Full control of private repositories
+  - `admin:repo_hook` - For managing webhooks
+- Click **Generate token**
+- **Copy the token immediately** (you won't see it again!)
+
+#### 4.2.2: Set Up GitHub Webhook
+
+1. **Go to your GitHub repository:**
+   ```
+   https://github.com/YOUR-USERNAME/Medi.Way
+   ```
+
+2. **Navigate to Settings:**
+   - Click **Settings** tab (top right of repo)
+   - Click **Webhooks** (left sidebar)
+   - Click **Add webhook** button
+
+3. **Configure Webhook:**
+   ```
+   Payload URL: http://YOUR_EC2_PUBLIC_IP:8080/github-webhook/
+   (Example: http://13.62.209.133:8080/github-webhook/)
+   
+   Content type: application/json
+   
+   Secret: [Leave empty or add a secret token for security]
+   
+   SSL verification: [Leave as default]
+   
+   Which events would you like to trigger this webhook?
+   • Just the push event (selected by default)
+   
+   Active: ✓ (checked)
+   ```
+
+4. **Click "Add webhook"**
+
+5. **Verify Webhook:**
+   - After adding, GitHub will immediately test the webhook
+   - You should see a green checkmark ✓ next to your webhook
+   - If you see a red X, check:
+     - Jenkins URL is accessible from internet
+     - Port 8080 is open in EC2 security group
+     - URL ends with `/github-webhook/`
+
+**⚠️ Important Security Note:**
+If your EC2 instance has a dynamic IP, consider:
+- Using an Elastic IP (AWS) for a permanent address
+- Using a domain name with DNS
+- For testing, dynamic IP works but may change if instance restarts
 
 ---
 
@@ -573,16 +629,21 @@ Project url: https://github.com/YOUR-USERNAME/Medi.Way/
 
 #### 5.2.2: Build Triggers
 
+**Recommended:** Use GitHub webhook for instant builds:
+```
+[x] GitHub hook trigger for GITScm polling
+(Builds automatically when you push to GitHub - instant!)
+```
+
+**Alternative:** If webhook is not working, use Poll SCM:
 ```
 [x] Poll SCM
 Schedule: H/5 * * * *
-(This checks GitHub every 5 minutes for changes)
+(This checks GitHub every 5 minutes for changes - slower but reliable)
 ```
 
-**Alternative:** For webhook-based builds (more advanced):
-```
-[x] GitHub hook trigger for GITScm polling
-```
+**✅ Use webhook** if you completed Step 4.2.2 (GitHub Webhook setup)  
+**📊 Use Poll SCM** as backup or if webhook can't be configured
 
 #### 5.2.3: Pipeline Section
 
@@ -1056,6 +1117,59 @@ Stage 2: Build Backend → FAILED
    java -version  # Must be Java 17
    ```
 
+### Issue 8: GitHub Webhook Not Working
+
+**Symptom:**
+```
+Pushed to GitHub but Jenkins doesn't build automatically
+```
+
+**Solutions:**
+
+1. **Verify Webhook Configuration:**
+   ```
+   GitHub Repo → Settings → Webhooks
+   - Should see green ✓ next to webhook
+   - If red X, click to see error details
+   ```
+
+2. **Check Jenkins is Accessible:**
+   ```bash
+   # From your local machine, test if Jenkins is reachable
+   curl http://YOUR_EC2_IP:8080/github-webhook/
+   
+   # Expected: Some response (not connection refused)
+   ```
+
+3. **Verify Security Group:**
+   - AWS Console → EC2 → Security Groups
+   - Ensure Port 8080 is open to `0.0.0.0/0` (or at least GitHub's IP ranges)
+   - GitHub webhook needs internet access to your Jenkins
+
+4. **Check Recent Deliveries:**
+   - GitHub → Settings → Webhooks → Click your webhook
+   - Scroll to "Recent Deliveries"
+   - Click on a delivery to see request/response
+   - Look for errors in the response
+
+5. **Test Webhook Manually:**
+   ```
+   GitHub → Webhook → Click "Redeliver"
+   Check if Jenkins receives it
+   ```
+
+6. **Enable Poll SCM as Backup:**
+   - If webhook continues failing, enable Poll SCM in Jenkins
+   - Builds will happen but with 5-minute delay
+
+7. **Common Webhook Errors:**
+   ```
+   "Connection refused" → Jenkins not running or port blocked
+   "Timeout" → Security group blocking traffic
+   "404 Not Found" → URL incorrect (should be /github-webhook/)
+   "500 Internal Error" → Check Jenkins logs
+   ```
+
 ---
 
 ## 📊 Understanding Pipeline Stages
@@ -1293,28 +1407,40 @@ docker-compose pull
 
 After completing this guide, you should:
 
-### 1. Test Your Pipeline
+### 1. Test Your Pipeline with Automated Builds
 ```bash
 # Make a code change
 # Commit and push
 git commit -am "Test CI/CD pipeline"
 git push origin main
 
-# Watch Jenkins automatically build and deploy
+# With webhook: Build starts immediately (within seconds)
+# With Poll SCM: Build starts within 5 minutes
+
+# Watch Jenkins dashboard for automatic build
 ```
 
-### 2. Set Up Automated Triggers
+**Expected behavior:**
+- **Webhook:** Build appears within 5-10 seconds of push
+- **Poll SCM:** Build appears within 5 minutes of push
 
-**Option A: GitHub Webhook (Recommended)**
-1. GitHub Repo → Settings → Webhooks → Add webhook
-2. Payload URL: `http://YOUR_JENKINS_IP:8080/github-webhook/`
-3. Content type: `application/json`
-4. Events: Push events
-5. Save
+### 2. Verify Automated Triggers
 
-**Option B: Poll SCM (Already configured)**
+**If using GitHub Webhook (Recommended - Step 4.2.2):**
+- Push a test commit to your repository
+- Jenkins should build automatically within seconds
+- Check Jenkins dashboard for the new build
+
+**Verify webhook is working:**
+1. GitHub Repo → Settings → Webhooks
+2. Click on your webhook
+3. Scroll to "Recent Deliveries"
+4. You should see successful deliveries (green checkmark ✓)
+
+**If using Poll SCM:**
 - Jenkins checks GitHub every 5 minutes
 - Builds automatically on new commits
+- Slightly slower but reliable
 
 ### 3. Add Notifications
 
@@ -1403,13 +1529,17 @@ Mark items as you complete them:
 - [ ] DockerHub account created
 - [ ] DockerHub credentials added to Jenkins
 - [ ] GitHub repository set up
+- [ ] GitHub Personal Access Token created
+- [ ] GitHub webhook configured
+- [ ] Webhook tested and working (green checkmark in GitHub)
 - [ ] EC2 SSH key added to Jenkins (if deploying)
 
 ### Pipeline Setup
 - [ ] Pipeline job created in Jenkins
 - [ ] GitHub repository connected
 - [ ] Jenkinsfile configured with DockerHub username
-- [ ] Build triggers configured (Poll SCM or Webhook)
+- [ ] Build triggers configured (GitHub webhook recommended)
+- [ ] Webhook verified working in GitHub
 
 ### First Build
 - [ ] Manual build triggered successfully
@@ -1460,6 +1590,7 @@ By completing this guide, you now understand:
 ✅ **DockerHub**: Push and pull Docker images  
 ✅ **Quality Gates**: Prevent bad code from deploying  
 ✅ **Automated Deployment**: Deploy on every commit  
+✅ **GitHub Webhooks**: Instant build triggers on code push  
 ✅ **Security**: Manage credentials securely  
 
 ---
@@ -1469,7 +1600,7 @@ By completing this guide, you now understand:
 You've successfully implemented a complete CI/CD pipeline for the Medi.Way Healthcare Management System!
 
 **Your pipeline now:**
-- ✅ Automatically builds on every commit
+- ✅ Automatically builds on every commit (instant with webhooks!)
 - ✅ Runs 88 automated tests
 - ✅ Prevents broken code from deploying
 - ✅ Containerizes your application
@@ -1480,6 +1611,7 @@ You've successfully implemented a complete CI/CD pipeline for the Medi.Way Healt
 - **Build Time:** ~8-10 minutes
 - **Test Coverage:** 88 automated tests
 - **Deployment Time:** ~2 minutes
+- **Trigger Latency:** <10 seconds (webhook) or ~5 minutes (poll)
 - **Success Rate:** Should be 95%+
 
 ---

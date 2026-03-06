@@ -8,8 +8,9 @@ import backend.model.Patient;
 import backend.repository.PatientRepository;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,16 +30,17 @@ public class PatientServiceTest {
     private PatientRepository patientRepository;
     
     private PatientService patientService;
+    private AutoCloseable closeable;
     
-    @BeforeClass
-    public void setUpClass() {
-        MockitoAnnotations.openMocks(this);
+    @BeforeMethod
+    public void setUp() {
+        closeable = MockitoAnnotations.openMocks(this);
         patientService = new PatientService(patientRepository);
     }
     
-    @BeforeMethod
-    public void resetMocks() {
-        reset(patientRepository);
+    @AfterMethod
+    public void tearDown() throws Exception {
+        closeable.close();
     }
     
     @Test(groups = {"unit", "service"})
@@ -171,8 +173,9 @@ public class PatientServiceTest {
         patient.setFullName("John Doe");
         patient.setEmail("john@example.com");
         patient.setHealthId("HEALTH123456");
-        // BCrypt hash of "password123"
-        patient.setPasswordHash("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZRGfECmRquP1MV4v8Wq6kQqLqLLB2");
+        // Generate BCrypt hash for "password123" - use same encoder as service
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        patient.setPasswordHash(encoder.encode("password123"));
         return patient;
     }
 }

@@ -9,7 +9,7 @@ import backend.repository.PatientRepository;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,16 +37,12 @@ public class AppointmentServiceTest {
     private AppointmentService appointmentService;
     private Patient testPatient;
     private Doctor testDoctor;
-    
-    @BeforeClass
-    public void setUpClass() {
-        MockitoAnnotations.openMocks(this);
-        appointmentService = new AppointmentService(appointmentRepository, doctorRepository, patientRepository);
-    }
+    private AutoCloseable closeable;
     
     @BeforeMethod
     public void setUp() {
-        reset(appointmentRepository, doctorRepository, patientRepository);
+        closeable = MockitoAnnotations.openMocks(this);
+        appointmentService = new AppointmentService(appointmentRepository, doctorRepository, patientRepository);
         
         // Setup test patient
         testPatient = new Patient();
@@ -61,6 +57,11 @@ public class AppointmentServiceTest {
         testDoctor.setName("Dr. Test");
         testDoctor.setEmail("doctor@test.com");
         testDoctor.setSpecialization("General");
+    }
+    
+    @AfterMethod
+    public void tearDown() throws Exception {
+        closeable.close();
     }
     
     @Test(groups = {"unit", "service"})
