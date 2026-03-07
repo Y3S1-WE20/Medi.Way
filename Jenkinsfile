@@ -289,7 +289,7 @@ pipeline {
                             echo "Connected to EC2 instance"
                             
                             # Navigate to application directory
-                            cd /home/ubuntu/mediway
+                            cd /home/ubuntu/mediway/Medi.Way
                             
                             # Export environment variables
                             export BUILD_NUMBER=${IMAGE_TAG}
