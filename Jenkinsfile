@@ -343,7 +343,7 @@ pipeline {
                     
                     // Check backend health
                     def backendHealth = sh(
-                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}:8080/actuator/health || echo '000'",
+                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}:8081/actuator/health || echo '000'",
                         returnStdout: true
                     ).trim()
                     
