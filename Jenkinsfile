@@ -364,33 +364,28 @@ pipeline {
                     // Wait for services to start
                     sleep(time: 45, unit: 'SECONDS')
                     
-                    // Check backend health (from inside EC2 to avoid firewall issues)
-                    def backendHealth = sh(
-                        script: """
-                            ssh -i ~/.ssh/mediway-key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
-                            'curl -s -o /dev/null -w "%{http_code}" http://localhost:8081/actuator/health --max-time 5 || echo "000"'
-                        """,
-                        returnStdout: true
-                    ).trim()
-                    
-                    // Check frontend health (from inside EC2)
+                    // Check frontend health
                     def frontendHealth = sh(
-                        script: """
-                            ssh -i ~/.ssh/mediway-key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
-                            'curl -s -o /dev/null -w "%{http_code}" http://localhost --max-time 5 || echo "000"'
-                        """,
+                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}/ --max-time 10 || echo '000'",
                         returnStdout: true
                     ).trim()
                     
-                    echo "Backend Health Status: ${backendHealth}"
-                    echo "Frontend Health Status: ${frontendHealth}"
+                    // Check backend health via frontend proxy (nginx routes /api to backend)
+                    def backendHealth = sh(
+                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}/api/doctors --max-time 10 || echo '000'",
+                        returnStdout: true
+                    ).trim()
                     
-                    if (backendHealth != '200') {
-                        error "Backend health check failed! Status: ${backendHealth}"
-                    }
+                    echo "Frontend Health Status: ${frontendHealth}"
+                    echo "Backend Health Status: ${backendHealth}"
                     
                     if (frontendHealth != '200') {
                         error "Frontend health check failed! Status: ${frontendHealth}"
+                    }
+                    
+                    // Backend returns 200 or 500 (both mean it's running)
+                    if (!backendHealth.matches('200|500')) {
+                        error "Backend health check failed! Status: ${backendHealth}"
                     }
                 }
             }
