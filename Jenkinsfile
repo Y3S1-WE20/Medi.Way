@@ -26,7 +26,7 @@ pipeline {
         DOCKER_USERNAME = 'shiranthads'  // Your DockerHub username
         
         // AWS EC2 Configuration
-        EC2_HOST = 'your-ec2-public-ip'  // Replace with your EC2 public IP when deploying
+        EC2_HOST = '13.62.209.133'  // Replace with your EC2 public IP when deploying
         EC2_USER = 'ubuntu'
         
         // Application Configuration
