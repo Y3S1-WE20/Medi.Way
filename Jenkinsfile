@@ -284,37 +284,39 @@ pipeline {
                 sshagent(['ec2-ssh-key']) {
                     sh """
                         echo "Connecting to EC2 instance..."
+                        echo "Using image tag: ${IMAGE_TAG}"
+                        echo "Using DockerHub username: ${DOCKER_USERNAME}"
                         
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
-                            echo "Connected to EC2 instance"
+                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+                            echo 'Connected to EC2 instance'
                             
                             # Navigate to application directory
                             cd /home/ubuntu/mediway/Medi.Way
                             
-                            # Export environment variables
-                            export BUILD_NUMBER=${IMAGE_TAG}
-                            export DOCKER_USERNAME=${DOCKER_USERNAME}
-                            
-                            # Pull latest images
-                            echo "Pulling latest images..."
-                            docker-compose pull
+                            # Pull latest images with environment variables
+                            echo 'Pulling latest images...'
+                            BUILD_NUMBER=${IMAGE_TAG} DOCKER_USERNAME=${DOCKER_USERNAME} docker-compose pull
                             
                             # Stop existing containers
-                            echo "Stopping existing containers..."
+                            echo 'Stopping existing containers...'
                             docker-compose down
                             
-                            # Start new containers
-                            echo "Starting new containers..."
-                            docker-compose up -d
+                            # Start new containers with environment variables
+                            echo 'Starting new containers...'
+                            BUILD_NUMBER=${IMAGE_TAG} DOCKER_USERNAME=${DOCKER_USERNAME} docker-compose up -d
                             
-                            # Cleanup old images
-                            echo "Cleaning up old images..."
-                            docker image prune -f
+                            # Wait for services to start
+                            echo 'Waiting for services to start...'
+                            sleep 10
                             
                             # Show running containers
-                            echo "Running containers:"
+                            echo 'Running containers:'
                             docker-compose ps
-                        '
+                            
+                            # Cleanup old images
+                            echo 'Cleaning up old images...'
+                            docker image prune -f
+                        "
                     """
                 }
             }
