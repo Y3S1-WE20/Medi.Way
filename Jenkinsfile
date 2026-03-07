@@ -364,15 +364,21 @@ pipeline {
                     // Wait for services to start
                     sleep(time: 45, unit: 'SECONDS')
                     
-                    // Check backend health
+                    // Check backend health (from inside EC2 to avoid firewall issues)
                     def backendHealth = sh(
-                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}:8081/actuator/health || echo '000'",
+                        script: """
+                            ssh -i ~/.ssh/mediway-key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
+                            'curl -s -o /dev/null -w "%{http_code}" http://localhost:8081/actuator/health --max-time 5 || echo "000"'
+                        """,
                         returnStdout: true
                     ).trim()
                     
-                    // Check frontend health
+                    // Check frontend health (from inside EC2)
                     def frontendHealth = sh(
-                        script: "curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}/ || echo '000'",
+                        script: """
+                            ssh -i ~/.ssh/mediway-key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
+                            'curl -s -o /dev/null -w "%{http_code}" http://localhost --max-time 5 || echo "000"'
+                        """,
                         returnStdout: true
                     ).trim()
                     
