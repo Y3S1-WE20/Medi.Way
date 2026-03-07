@@ -43,7 +43,7 @@ function Register() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8080/api/patients/register', {
+      const res = await fetch('/api/patients/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,7 +85,7 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8080/api/patients/login', {
+      const res = await fetch('/api/patients/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -116,7 +116,7 @@ function Success() {
   const healthId = params.get('healthId');
   const name = params.get('name');
 
-  const qrUrl = `http://localhost:8080/api/patients/${encodeURIComponent(healthId)}/qr`;
+  const qrUrl = `/api/patients/${encodeURIComponent(healthId)}/qr`;
   const downloadUrl = `${qrUrl}?download=true`;
 
   return (

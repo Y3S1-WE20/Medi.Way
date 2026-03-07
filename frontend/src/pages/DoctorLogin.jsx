@@ -10,7 +10,7 @@ export default function DoctorLogin(){
   async function submit(e){
     e.preventDefault(); setError('');
     try{
-      const res = await fetch('http://localhost:8080/api/doctors/login', {
+      const res = await fetch('/api/doctors/login', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(form)

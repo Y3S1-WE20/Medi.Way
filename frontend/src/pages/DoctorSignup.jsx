@@ -13,13 +13,13 @@ export default function DoctorSignup(){
     e.preventDefault(); setError(''); setStatus('');
     try{
       // find doctor by email
-      const listRes = await fetch('http://localhost:8080/api/doctors');
+      const listRes = await fetch('/api/doctors');
       if(!listRes.ok) throw new Error(await listRes.text());
       const list = await listRes.json();
       const doc = list.find(d => (d.email || '').toLowerCase() === form.email.toLowerCase());
       if(!doc) throw new Error('Doctor email not found. Please contact admin.');
       const params = new URLSearchParams({ password: form.password });
-      const res = await fetch(`http://localhost:8080/api/doctors/${doc.id}/password?`+params.toString(), { method: 'POST' });
+      const res = await fetch(`/api/doctors/${doc.id}/password?`+params.toString(), { method: 'POST' });
       if(!res.ok){
         const text = await res.text();
         throw new Error(text || 'Failed to set password');

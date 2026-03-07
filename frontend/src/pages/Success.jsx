@@ -5,7 +5,7 @@ export default function Success(){
   const [params] = useSearchParams();
   const healthId = params.get('healthId');
   const name = params.get('name');
-  const qrUrl = `http://localhost:8080/api/patients/${encodeURIComponent(healthId)}/qr`;
+  const qrUrl = `/api/patients/${encodeURIComponent(healthId)}/qr`;
   const downloadUrl = `${qrUrl}?download=true`;
 
   return (

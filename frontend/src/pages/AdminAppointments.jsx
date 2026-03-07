@@ -5,12 +5,12 @@ export default function AdminAppointments(){
   const [list, setList] = React.useState([]);
 
   async function load(){
-    const res = await fetch('http://localhost:8080/api/admin/appointments');
+    const res = await fetch('/api/admin/appointments');
     setList(await res.json());
   }
 
-  async function confirm(id){ await fetch(`http://localhost:8080/api/admin/appointments/${id}/confirm`, { method:'POST' }); load(); }
-  async function reject(id){ await fetch(`http://localhost:8080/api/admin/appointments/${id}/reject`, { method:'POST' }); load(); }
+  async function confirm(id){ await fetch(`/api/admin/appointments/${id}/confirm`, { method:'POST' }); load(); }
+  async function reject(id){ await fetch(`/api/admin/appointments/${id}/reject`, { method:'POST' }); load(); }
 
   React.useEffect(()=>{ load(); },[]);
 

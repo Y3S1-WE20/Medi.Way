@@ -15,7 +15,7 @@ export default function AdminDoctors(){
     if(file){ setPreview(URL.createObjectURL(file)); } else { setPreview(''); }
   }
   async function refresh(){
-    const res = await fetch('http://localhost:8080/api/doctors');
+    const res = await fetch('/api/doctors');
     setList(await res.json());
   }
   React.useEffect(()=>{ refresh(); },[]);
@@ -28,7 +28,7 @@ export default function AdminDoctors(){
     fd.append('specialization', form.specialization);
     if(photo) fd.append('photo', photo);
     try{
-      const res = await fetch('http://localhost:8080/api/doctors', { method:'POST', body: fd });
+      const res = await fetch('/api/doctors', { method:'POST', body: fd });
       if(!res.ok) throw new Error(await res.text());
       setStatus('Doctor saved successfully.');
       setForm({name:'',email:'',specialization:''});
@@ -42,7 +42,7 @@ export default function AdminDoctors(){
     const d = list.find(x=>x.id===id);
     if(!d) return;
     setForm({ name:d.name, email:d.email, specialization:d.specialization });
-    setPreview(`http://localhost:8080/api/doctors/${id}/photo`);
+    setPreview(`/api/doctors/${id}/photo`);
     setPhoto(null);
   }
 
@@ -54,7 +54,7 @@ export default function AdminDoctors(){
     if(form.specialization) fd.append('specialization', form.specialization);
     if(photo!==null) fd.append('photo', photo || new File([], ''));
     try{
-      const res = await fetch(`http://localhost:8080/api/doctors/${editingId}`, { method:'PUT', body: fd });
+      const res = await fetch(`/api/doctors/${editingId}`, { method:'PUT', body: fd });
       if(!res.ok) throw new Error(await res.text());
       setStatus('Doctor updated.');
       setEditingId(null);
@@ -66,7 +66,7 @@ export default function AdminDoctors(){
 
   async function remove(id){
     if(!window.confirm('Delete this doctor?')) return;
-    await fetch(`http://localhost:8080/api/doctors/${id}`, { method:'DELETE' });
+    await fetch(`/api/doctors/${id}`, { method:'DELETE' });
     refresh();
   }
 
@@ -102,7 +102,7 @@ export default function AdminDoctors(){
             {list.map(d => (
               <tr key={d.id}>
                 <td style={{padding:'8px 6px'}}>
-                  <img src={`http://localhost:8080/api/doctors/${d.id}/photo`} alt="" style={{width:48,height:48,objectFit:'cover',borderRadius:10,border:'1px solid #e5e7eb'}} onError={(e)=>{e.currentTarget.style.visibility='hidden'}}/>
+                  <img src={`/api/doctors/${d.id}/photo`} alt="" style={{width:48,height:48,objectFit:'cover',borderRadius:10,border:'1px solid #e5e7eb'}} onError={(e)=>{e.currentTarget.style.visibility='hidden'}}/>
                 </td>
                 <td style={{padding:'8px 6px'}}>{d.name}</td>
                 <td style={{padding:'8px 6px'}}>{d.email}</td>

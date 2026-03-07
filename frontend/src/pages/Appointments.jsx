@@ -19,7 +19,7 @@ export default function Appointments(){
   // Load patient info when healthId available
   const loadPatient = React.useCallback(async () => {
     if(!healthId) { setPatient(null); return; }
-    const res = await fetch(`http://localhost:8080/api/patients/${encodeURIComponent(healthId)}`);
+    const res = await fetch(`/api/patients/${encodeURIComponent(healthId)}`);
     if(res.ok){ setPatient(await res.json()); }
   }, [healthId]);
 
@@ -28,7 +28,7 @@ export default function Appointments(){
   // Load all doctors
   React.useEffect(() => {
     (async () => {
-      const res = await fetch('http://localhost:8080/api/doctors');
+      const res = await fetch('/api/doctors');
       if(res.ok) setDoctors(await res.json());
     })();
   }, []);
@@ -39,7 +39,7 @@ export default function Appointments(){
       setSlots([]);
       setSelectedSlot('');
       if(!selectedDoctor || !date) return;
-      const res = await fetch(`http://localhost:8080/api/appointments/slots?doctorId=${selectedDoctor}&date=${date}`);
+      const res = await fetch(`/api/appointments/slots?doctorId=${selectedDoctor}&date=${date}`);
       if(res.ok) setSlots(await res.json());
     })();
   }, [selectedDoctor, date]);
@@ -50,13 +50,13 @@ export default function Appointments(){
       setStatus('Please complete all fields.');
       return;
     }
-    const res = await fetch(`http://localhost:8080/api/appointments/book?healthId=${encodeURIComponent(healthId)}&doctorId=${selectedDoctor}&date=${date}&time=${selectedSlot}`, { method:'POST' });
+    const res = await fetch(`/api/appointments/book?healthId=${encodeURIComponent(healthId)}&doctorId=${selectedDoctor}&date=${date}&time=${selectedSlot}`, { method:'POST' });
     if(!res.ok) { setStatus('Booking failed'); return; }
     setShowSuccess(true);
   }
 
   const today = new Date().toISOString().slice(0,10);
-  const qrUrl = healthId ? `http://localhost:8080/api/patients/${encodeURIComponent(healthId)}/qr` : '';
+  const qrUrl = healthId ? `/api/patients/${encodeURIComponent(healthId)}/qr` : '';
 
   React.useEffect(()=>{
     if(!showSuccess) return;
@@ -97,7 +97,7 @@ export default function Appointments(){
           {doctors.map(d => (
             <div key={d.id} className={`chip ${selectedDoctor===d.id ? 'active':''}`} onClick={()=>setSelectedDoctor(d.id)} style={{padding:14}}>
               <div style={{display:'flex', alignItems:'center', gap:12}}>
-                <img src={`http://localhost:8080/api/doctors/${d.id}/photo`} alt="" width={48} height={48} style={{objectFit:'cover', borderRadius:10, border:'1px solid var(--border)'}} onError={(e)=>{e.currentTarget.style.visibility='hidden'}}/>
+                <img src={`/api/doctors/${d.id}/photo`} alt="" width={48} height={48} style={{objectFit:'cover', borderRadius:10, border:'1px solid var(--border)'}} onError={(e)=>{e.currentTarget.style.visibility='hidden'}}/>
                 <div>
                   <div style={{fontWeight:700}}>{d.name}</div>
                   <div className="subtle">{d.specialization}</div>

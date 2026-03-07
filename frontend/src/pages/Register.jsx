@@ -12,7 +12,7 @@ export default function Register(){
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8080/api/patients/register', {
+      const res = await fetch('/api/patients/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

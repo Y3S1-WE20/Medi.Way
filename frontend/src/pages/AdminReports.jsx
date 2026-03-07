@@ -17,7 +17,7 @@ import {
   Cell,
 } from 'recharts';
 
-const API = 'http://localhost:8080/api/reports';
+const API = '/api/reports';
 
 function useFetch(url){
   const [data,setData] = useState(null);

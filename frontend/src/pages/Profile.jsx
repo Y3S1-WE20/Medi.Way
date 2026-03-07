@@ -12,9 +12,9 @@ export default function Profile(){
   const load = React.useCallback(async () => {
     if(!healthId) return;
     const [pRes, aRes, rRes] = await Promise.all([
-      fetch(`http://localhost:8080/api/patients/${encodeURIComponent(healthId)}`),
-      fetch(`http://localhost:8080/api/appointments/mine?healthId=${encodeURIComponent(healthId)}`),
-      fetch(`http://localhost:8080/api/patients/${encodeURIComponent(healthId)}/records`)
+      fetch(`/api/patients/${encodeURIComponent(healthId)}`),
+      fetch(`/api/appointments/mine?healthId=${encodeURIComponent(healthId)}`),
+      fetch(`/api/patients/${encodeURIComponent(healthId)}/records`)
     ]);
     if (pRes.ok) setPatient(await pRes.json());
     if (aRes.ok) setList(await aRes.json());
@@ -28,13 +28,13 @@ export default function Profile(){
     if(date) qp.push(`date=${date}`);
     if(time) qp.push(`time=${time}`);
     if(qp.length===0) return;
-    await fetch(`http://localhost:8080/api/appointments/${id}?${qp.join('&')}`, { method:'PUT' });
+    await fetch(`/api/appointments/${id}?${qp.join('&')}`, { method:'PUT' });
     setDate(''); setTime('');
     load();
   }
 
   async function cancel(id){
-    await fetch(`http://localhost:8080/api/appointments/${id}`, { method:'DELETE' });
+    await fetch(`/api/appointments/${id}`, { method:'DELETE' });
     load();
   }
 
@@ -43,7 +43,7 @@ export default function Profile(){
     try { await navigator.clipboard.writeText(patient.healthId); } catch {}
   }
 
-  const qrUrl = patient?.healthId ? `http://localhost:8080/api/patients/${encodeURIComponent(patient.healthId)}/qr` : '';
+  const qrUrl = patient?.healthId ? `/api/patients/${encodeURIComponent(patient.healthId)}/qr` : '';
 
   return (
     <div className="card section">

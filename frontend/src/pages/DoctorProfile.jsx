@@ -66,11 +66,11 @@ export default function DoctorProfile(){
       try{
         setError('');
         if(!doctorId) return;
-        const dRes = await fetch(`http://localhost:8080/api/doctors/${doctorId}`);
+        const dRes = await fetch(`/api/doctors/${doctorId}`);
         if(!dRes.ok) throw new Error(await dRes.text());
         const d = await dRes.json();
         setDoctor(d);
-        const aRes = await fetch(`http://localhost:8080/api/doctors/${doctorId}/appointments`);
+        const aRes = await fetch(`/api/doctors/${doctorId}/appointments`);
         if(!aRes.ok) throw new Error(await aRes.text());
         const a = await aRes.json();
         setAppointments(a);
@@ -105,7 +105,7 @@ export default function DoctorProfile(){
         <div>
           {doctor && (
             <div className="card" style={{display:'flex', gap:16, alignItems:'center'}}>
-              <img src={`http://localhost:8080/api/doctors/${doctorId}/photo`} alt="doctor" onError={(e)=>{e.currentTarget.style.display='none'}} style={{width:96,height:96,objectFit:'cover',borderRadius:12,border:'1px solid #e5e7eb'}}/>
+              <img src={`/api/doctors/${doctorId}/photo`} alt="doctor" onError={(e)=>{e.currentTarget.style.display='none'}} style={{width:96,height:96,objectFit:'cover',borderRadius:12,border:'1px solid #e5e7eb'}}/>
               <div>
                 <div style={{fontWeight:600, fontSize:18}}>{doctor.name}</div>
                 <div style={{color:'#374151'}}>{doctor.email}</div>
@@ -161,7 +161,7 @@ export default function DoctorProfile(){
           <button className="btn primary" onClick={async()=>{
             setRecStatus('');
             try{
-              const res = await fetch('http://localhost:8080/api/records', {
+              const res = await fetch('/api/records', {
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({
@@ -195,7 +195,7 @@ export default function DoctorProfile(){
                 setPatientRecords([]);
                 if(!viewHealthId) return;
                 try{
-                  const res = await fetch(`http://localhost:8080/api/patients/${encodeURIComponent(viewHealthId)}/records`);
+                  const res = await fetch(`/api/patients/${encodeURIComponent(viewHealthId)}/records`);
                   if(!res.ok) throw new Error(await res.text());
                   const data = await res.json();
                   setPatientRecords(data);
