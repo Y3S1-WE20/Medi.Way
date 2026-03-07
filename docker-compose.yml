@@ -57,9 +57,9 @@ services:
     image: ${DOCKER_USERNAME:-mediway}/mediway-backend:${BUILD_NUMBER:-latest}
     container_name: mediway-backend
     restart: unless-stopped
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    # build:  # Commented out for production - use pre-built images from DockerHub
+    #   context: ./backend
+    #   dockerfile: Dockerfile
     environment:
       # Database Configuration
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mediway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
@@ -98,9 +98,9 @@ services:
     image: ${DOCKER_USERNAME:-mediway}/mediway-frontend:${BUILD_NUMBER:-latest}
     container_name: mediway-frontend
     restart: unless-stopped
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    # build:  # Commented out for production - use pre-built images from DockerHub
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
     ports:
       - "80:80"
     networks:

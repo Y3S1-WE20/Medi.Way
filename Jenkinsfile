@@ -293,25 +293,40 @@ pipeline {
                             # Navigate to application directory
                             cd /home/ubuntu/mediway/Medi.Way
                             
-                            # Pull latest images with environment variables
-                            echo 'Pulling latest images...'
-                            BUILD_NUMBER=${IMAGE_TAG} DOCKER_USERNAME=${DOCKER_USERNAME} docker-compose pull
+                            # Pull latest docker-compose.yml from git
+                            echo 'Pulling latest configuration from GitHub...'
+                            git pull origin main
+                            
+                            # Export environment variables for docker-compose
+                            export BUILD_NUMBER=${IMAGE_TAG}
+                            export DOCKER_USERNAME=${DOCKER_USERNAME}
+                            
+                            echo 'Using BUILD_NUMBER='${IMAGE_TAG}
+                            echo 'Using DOCKER_USERNAME='${DOCKER_USERNAME}
+                            
+                            # Pull latest images
+                            echo 'Pulling latest Docker images...'
+                            docker-compose pull
                             
                             # Stop existing containers
                             echo 'Stopping existing containers...'
                             docker-compose down
                             
-                            # Start new containers with environment variables
+                            # Start new containers
                             echo 'Starting new containers...'
-                            BUILD_NUMBER=${IMAGE_TAG} DOCKER_USERNAME=${DOCKER_USERNAME} docker-compose up -d
+                            docker-compose up -d
                             
                             # Wait for services to start
                             echo 'Waiting for services to start...'
-                            sleep 10
+                            sleep 15
                             
                             # Show running containers
                             echo 'Running containers:'
                             docker-compose ps
+                            
+                            # Show container logs (last 20 lines)
+                            echo 'Recent logs:'
+                            docker-compose logs --tail=20
                             
                             # Cleanup old images
                             echo 'Cleaning up old images...'
