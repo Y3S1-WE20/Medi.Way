@@ -1,10 +1,12 @@
 # ============================================================
 # MEDI.WAY Backend Dockerfile
 # Multi-stage build for optimal image size
+# ARM64/Apple Silicon compatible
 # ============================================================
 
 # Stage 1: Build Stage
-FROM eclipse-temurin:17-jdk-alpine AS builder
+# Note: Using non-alpine version for ARM64/Apple Silicon compatibility
+FROM eclipse-temurin:17-jdk AS builder
 
 LABEL maintainer="MEDI.WAY Team"
 LABEL description="MEDI.WAY Healthcare Backend API"
