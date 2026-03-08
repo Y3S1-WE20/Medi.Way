@@ -20,6 +20,9 @@ pipeline {
     // ENVIRONMENT VARIABLES (LOCAL CONFIGURATION)
     // ============================================================
     environment {
+        // Docker path for Mac (Jenkins needs this to find Docker)
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
+        
         // Docker Hub credentials (configured in Jenkins)
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         DOCKER_USERNAME = 'shiranthads'
