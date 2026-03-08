@@ -32,15 +32,16 @@ COPY testng.xml .
 RUN ./mvnw clean package -DskipTests -B
 
 # Stage 2: Runtime Stage
-FROM eclipse-temurin:17-jre-alpine
+# Note: Using non-alpine version for ARM64/Apple Silicon compatibility
+FROM eclipse-temurin:17-jre
 
 LABEL maintainer="MEDI.WAY Team"
 LABEL description="MEDI.WAY Healthcare Backend API - Runtime"
 
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -S mediway && adduser -S mediway -G mediway
+# Create non-root user for security (Debian-based image)
+RUN groupadd --system mediway && useradd --system --gid mediway mediway
 
 # Copy built JAR from builder stage
 COPY --from=builder /app/target/*.jar app.jar
@@ -59,9 +60,9 @@ ENV JAVA_OPTS="-Xms256m -Xmx512m"
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check (using curl which is available in base image)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+    CMD curl --fail --silent http://localhost:8080/actuator/health || exit 1
 
 # Entry point with JVM options
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
